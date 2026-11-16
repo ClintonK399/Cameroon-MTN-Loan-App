@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, type KeyboardEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Wallet, ArrowLeft } from "lucide-react";
 
-const API_URL = "https://fastloan-momo-kj8m.onrender.com";
+// ✅ UPDATED TO NEW RENDER URL
+const API_URL = "https://cameroon-mtn-loan-app.onrender.com";
 
 const OTPVerification = () => {
   const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
@@ -13,7 +14,6 @@ const OTPVerification = () => {
   
   const phoneNumber = location.state?.phone || localStorage.getItem("userPhone") || "671234567";
 
-  // ✅ Updated format for Cameroon
   const formatPhone = (num: string) => {
     let clean = num.replace(/\D/g, ""); 
     if (clean.startsWith("237")) clean = clean.substring(3);
