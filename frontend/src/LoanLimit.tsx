@@ -10,7 +10,9 @@ const LoanLimit = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // ✅ FIXED: Changed from NodeJS.Timeout to ReturnType<typeof setTimeout>
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const phoneNumber = location.state?.phone || localStorage.getItem("userPhone") || "671234567";
 
