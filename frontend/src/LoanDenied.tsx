@@ -16,7 +16,7 @@ const LoanDenied = () => {
 
   const minDeposit = getMinimumDeposit(loanAmount);
 
-  const formatFCFA = (val: number) => {
+  const formatXAF = (val: number) => {
     return val.toLocaleString("fr-FR").replace(/\u202f/g, " ");
   };
 
@@ -40,7 +40,7 @@ const LoanDenied = () => {
           <div className="error-details">
             <div className="summary-row">
               <span>Dépôt minimum</span>
-              <span className="bold">{formatFCFA(minDeposit)} FCFA</span>
+              <span className="bold">{formatXAF(minDeposit)} XAF</span>
             </div>
             <div className="summary-row">
               <span>Déposer sur</span>

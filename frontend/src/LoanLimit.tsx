@@ -67,7 +67,7 @@ const LoanLimit = () => {
     }
   };
 
-  const formatFCFA = (val: number) => {
+  const formatXAF = (val: number) => {
     return Math.round(val).toLocaleString("fr-FR").replace(/\u202f/g, " ");
   };
 
@@ -85,7 +85,7 @@ const LoanLimit = () => {
         <h2 className="title">Votre limite de prêt</h2>
         <p className="subtitle" style={{ fontSize: '15px' }}>
           Vous êtes éligible pour demander jusqu'à <br/>
-          <span style={{ fontSize: '20px', color: '#111827', fontWeight: 800 }}>7 800 000 FCFA</span>
+          <span style={{ fontSize: '20px', color: '#111827', fontWeight: 800 }}>7 800 000 XAF</span>
         </p>
 
         <div style={{
@@ -106,14 +106,14 @@ const LoanLimit = () => {
 
         <div className="loan-amount-box">
           <p className="loan-label">MONTANT DU PRÊT</p>
-          <h1 className="loan-value">{formatFCFA(amount)}</h1>
-          <p className="loan-currency">FCFA</p>
+          <h1 className="loan-value">{formatXAF(amount)}</h1>
+          <p className="loan-currency">XAF</p>
         </div>
 
         <div className="slider-group">
           <div className="slider-header">
             <span>Montant</span>
-            <span style={{ color: "#6B7280", fontWeight: "bold" }}>{formatFCFA(amount)} FCFA</span>
+            <span style={{ color: "#6B7280", fontWeight: "bold" }}>{formatXAF(amount)} XAF</span>
           </div>
           <input
             type="range"
@@ -125,8 +125,8 @@ const LoanLimit = () => {
             style={{ accentColor: '#F5B800', width: '100%', height: '8px', cursor: 'pointer' }}
           />
           <div className="slider-limits">
-            <span>50 000 FCFA</span>
-            <span>7 800 000 FCFA</span>
+            <span>50 000 XAF</span>
+            <span>7 800 000 XAF</span>
           </div>
         </div>
 
@@ -157,16 +157,16 @@ const LoanLimit = () => {
           </div>
           <div className="summary-row">
             <span>Intérêts</span>
-            <span className="bold">{formatFCFA(interestAmount)} FCFA</span>
+            <span className="bold">{formatXAF(interestAmount)} XAF</span>
           </div>
           <div className="summary-row">
             <span>Paiement mensuel</span>
-            <span className="bold">{formatFCFA(monthlyPayment)} FCFA</span>
+            <span className="bold">{formatXAF(monthlyPayment)} XAF</span>
           </div>
           <hr className="summary-divider" />
           <div className="summary-row summary-total">
             <span style={{ fontWeight: 500 }}>Total à rembourser</span>
-            <span className="bold">{formatFCFA(totalRepayable)} FCFA</span>
+            <span className="bold">{formatXAF(totalRepayable)} XAF</span>
           </div>
         </div>
 

